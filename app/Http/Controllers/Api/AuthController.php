@@ -17,7 +17,7 @@ class AuthController extends Controller
 
         $usuario = Usuario::with('ventanilla')
             ->where('username', $request->username)
-            ->where('activo', true)
+            // ->where('activo', true)//
             ->first();
 
         if (!$usuario || !Hash::check($request->password, $usuario->password_hash)) {
@@ -56,3 +56,4 @@ class AuthController extends Controller
         );
     }
 }
+

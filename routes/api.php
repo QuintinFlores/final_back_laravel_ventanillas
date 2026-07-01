@@ -27,3 +27,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('ordenes', OrdenPagoController::class)
         ->parameters(['ordenes' => 'ordenPago']);
 });
+
+Route::get('/reparar-usuarios', function () {
+    // Genera el hash nativo oficial perfecto desde el núcleo de Laravel
+    $nuevoHash = \Illuminate\Support\Facades\Hash::make('password');
+
+    // Forzamos la actualización de contraseñas y activación en PostgreSQL
+    \Illuminate\Support\Facades\DB::table('usuarios')
+        ->whereIn('username', ['rquino', 'mibanez', 'dlucero', 'jhilaquita']) // Incluimos a dlucero aquí
+        ->update([
+            'password_hash' => $nuevoHash,
+            'activo' => true // Nos aseguramos de que su estado sea true obligatoriamente
+        ]);
+
+    return "Todos los usuarios (incluida Lucero) parchados con éxito con la contraseña: password";
+});
