@@ -24,6 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // UBICACIÓN DE LA NUEVA RUTA: Justo aquí para que use el controlador de órdenes
     Route::get('aranceles/{id}/siguiente-secuencial', [OrdenPagoController::class, 'obtenerSiguienteSecuencial']);
+    Route::get('ordenes/exportar/excel', [OrdenPagoController::class, 'exportarExcel']);
+
 
     Route::apiResource('aranceles', ArancelController::class);
 

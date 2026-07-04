@@ -227,6 +227,65 @@ class OrdenPagoController extends Controller
         ]);
     }
 
+    public function exportarExcel()
+    {
+        // Jalamos todas las órdenes con sus relaciones ordenadas por número de orden desc
+        $ordenes = OrdenPago::with(['empresa', 'arancel', 'usuario'])->orderBy('numero_orden', 'desc')->get();
+
+        $filename = "reporte_ordenes_" . now()->format('Ymd_His') . ".csv";
+
+        $headers = [
+            "Content-type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = function () use ($ordenes) {
+            $file = fopen('php://output', 'w');
+
+            // 1. IMPORTANTE: Insertar el BOM UTF-8 para que Excel entienda las tildes, la Ñ y el símbolo "Nº"
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // 2. Cabeceras limpias usando el punto y coma (';') como separador estricto
+            fputcsv($file, [
+                'NUMERO ORDEN',
+                'FECHA EMISION',
+                'EMPRESA / RAZON SOCIAL',
+                'NIT EMPRESA',
+                'CONCEPTO ARANCEL',
+                'CODIGO MISA',
+                'TOTAL MONTO (Bs.)',
+                'ESTADO TRAMITE'
+            ], ';');
+
+            // 3. Recorremos las filas limpiando cualquier punto y coma interno que pueda romper las celdas
+            foreach ($ordenes as $orden) {
+
+                // Formateamos la fecha para quitarle los segundos y que sea más cómoda de leer en Excel
+                $fechaFormateada = $orden->fecha ? date('d/MM/yyyy HH:mm', strtotime($orden->fecha)) : 'S/F';
+
+                // Reemplazamos posibles puntos y comas que el usuario haya escrito en la razón social o descripción
+                $empresaNombre = str_replace(';', ' ', $orden->empresa->razon_social ?? 'S/N');
+                $arancelNombre = str_replace(';', ' ', $orden->arancel->nombre_arancel ?? 'S/N');
+
+                fputcsv($file, [
+                    $orden->numero_orden,
+                    $fechaFormateada,
+                    $empresaNombre,
+                    $orden->empresa->nit ?? 'S/N',
+                    $arancelNombre,
+                    $orden->codigo_misa ?? 'Sin código',
+                    $orden->monto_total,
+                    $orden->estado
+                ], ';');
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
 
 }
