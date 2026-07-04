@@ -20,7 +20,7 @@ class OrdenPago extends Model
     ];
 
     protected $casts = [
-        'fecha' => 'date',
+        'fecha' => 'datetime',
         'monto_unitario' => 'decimal:2',
         'monto_total' => 'decimal:2',
     ];

@@ -37,10 +37,38 @@ class OrdenPagoController extends Controller
             'descripcion' => 'nullable|string|max:500',
         ]);
 
-        // Jalar datos del arancel automáticamente para proteger los montos
         $arancel = Arancel::findOrFail($request->arancel_id);
+        $anioActual = now()->year;
 
-        $orden = OrdenPago::create([
+        // 1. Buscamos y actualizamos el secuencial fuera de la transacción para asegurar el número inmediato
+        $registroSecuencial = \DB::table('arancel_secuenciales')
+            ->where('arancel_id', $arancel->id)
+            ->where('anio', $anioActual)
+            ->first();
+
+        if (!$registroSecuencial) {
+            \DB::table('arancel_secuenciales')->insert([
+                'arancel_id' => $arancel->id,
+                'anio' => $anioActual,
+                'secuencial' => 1,
+                'updated_at' => now()
+            ]);
+            $nuevoSecuencial = 1;
+        } else {
+            $nuevoSecuencial = $registroSecuencial->secuencial + 1;
+            \DB::table('arancel_secuenciales')
+                ->where('id', $registroSecuencial->id)
+                ->update([
+                    'secuencial' => $nuevoSecuencial,
+                    'updated_at' => now()
+                ]);
+        }
+
+        // 2. Construimos el código MISA garantizado
+        $codigoGenerado = "{$arancel->codigo_arancel}-{$nuevoSecuencial}-{$anioActual}";
+
+        // 3. Forzamos la inserción usando DB::table para saltar cualquier restricción oculta del Modelo ($fillable)
+        $idOrden = \DB::table('ordenes_pago')->insertGetId([
             'empresa_id' => $request->empresa_id,
             'arancel_id' => $request->arancel_id,
             'ventanilla_id' => $request->user()->ventanilla_id,
@@ -48,20 +76,20 @@ class OrdenPagoController extends Controller
             'cantidad' => $request->cantidad,
             'monto_unitario' => $arancel->monto,
 
-            // CAMBIA ÚNICAMENTE ESTA LÍNEA AQUÍ:
-            'codigo_misa' => $arancel->codigo_arancel,
+            // Aquí inyectamos el código directamente en PostgreSQL
+            'codigo_misa' => $codigoGenerado,
 
             'descripcion' => $request->descripcion,
             'estado' => 'ENTREGADO',
-            'fecha' => now()->toDateString(),
+            'fecha' => now()->toDateTimeString(),
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
 
+        // 4. Retornamos la orden fresca con sus relaciones para la respuesta JSON de Postman y Angular
+        $ordenFinal = OrdenPago::with(['empresa', 'arancel', 'ventanilla', 'usuario'])->findOrFail($idOrden);
 
-
-        return response()->json(
-            $orden->load(['empresa', 'arancel', 'ventanilla', 'usuario']),
-            201
-        );
+        return response()->json($ordenFinal, 201);
     }
 
     // Cambiado a $id manual para asegurar compatibilidad en Laravel 12
@@ -167,6 +195,38 @@ class OrdenPagoController extends Controller
 
         return "SON: " . trim($texto) . " $centavos/100 BOLIVIANOS";
     }
+
+    // MÉTODO PARA PREVISUALIZAR EL CÓDIGO MISA EN POSTMAN / ANGULAR
+    public function obtenerSiguienteSecuencial($id)
+    {
+        // 1. Buscamos que el arancel exista en Postgres
+        $arancel = Arancel::find($id);
+
+        if (!$arancel) {
+            return response()->json(['error' => 'Arancel no encontrado'], 404);
+        }
+
+        // 2. Obtenemos el año actual en base al servidor
+        $anioActual = now()->year;
+
+        // 3. Consultamos el estado actual del secuencial en tu tabla arancel_secuenciales
+        $registro = \DB::table('arancel_secuenciales')
+            ->where('arancel_id', $id)
+            ->where('anio', $anioActual)
+            ->first();
+
+        // 4. Si existe registro, el siguiente será +1. Si no existe, iniciará en 1.
+        $siguienteSecuencial = $registro ? ($registro->secuencial + 1) : 1;
+
+        // 5. Armamos la estructura exacta que me pediste: [CODIGO_ARANCEL]-[SECUENCIAL]-[AÑO]
+        $codigoMisaPrevisualizado = "{$arancel->codigo_arancel}-{$siguienteSecuencial}-{$anioActual}";
+
+        // 6. Retornamos la respuesta limpia en formato JSON
+        return response()->json([
+            'codigo_misa' => $codigoMisaPrevisualizado
+        ]);
+    }
+
 
 
 }
