@@ -5,29 +5,32 @@
     <meta charset="UTF-8">
     <title>Orden_Pago_{{ $orden->numero_orden }}</title>
     <style>
-        /* Ajuste de márgenes perimetrales para ganar espacio vertical */
+        /* Ajuste perimetral estricto para garantizar el espacio en tamaño Carta */
         @page {
-            margin: 10px 30px;
+            size: letter portrait;
+            margin: 18px 25px;
         }
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #111111;
             font-size: 9.5px;
-            /* Reducido un punto para textos largos */
-            line-height: 1.15;
+            line-height: 1.25;
+            /* Le damos un poco más de separación al texto */
             margin: 0;
             padding: 0;
         }
 
-        /* Reducimos ligeramente la altura de cada bloque para que encajen sí o sí */
+        /* MODIFICADO: Incrementamos la altura de 325px a 360px para rellenar la hoja */
         .talon-bloque {
-            height: 45%;
+            height: 450px;
             border: 1px solid #777777;
-            padding: 8px 12px;
+            padding: 15px 18px;
+            /* Más espacio interno para que se vea imponente */
             border-radius: 6px;
             box-sizing: border-box;
-            overflow: hidden;
+            background-color: #ffffff;
+            position: relative;
         }
 
         .header-table {
@@ -35,18 +38,38 @@
             border-collapse: collapse;
         }
 
-        .logo-cell {
-            width: 12%;
+        /* Ajustes para la nueva distribución de logos en la cabecera */
+        .logo-cell-left {
+            width: 10%;
             text-align: left;
             vertical-align: middle;
         }
 
-        .logo-img {
-            width: 40px;
+        .logo-cell-right {
+            width: 12%;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        /* Reducimos sutilmente el ancho de los títulos para dar espacio al segundo logo */
+        .title-cell {
+            width: 63%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Control estricto de dimensiones del logotipo de AGEMED */
+        .logo-agemed-img {
+            width: 48px;
             height: auto;
         }
 
-        /* Logo ligeramente más compacto */
+
+        .logo-img {
+            width: 42px;
+            height: auto;
+        }
+
         .title-cell {
             width: 73%;
             text-align: center;
@@ -60,7 +83,7 @@
         }
 
         .document-title {
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 800;
             margin-top: 1px;
             color: #000000;
@@ -81,7 +104,7 @@
 
         .numero-orden-box {
             border: 2px solid #000000;
-            width: 80px;
+            width: 85px;
             height: 24px;
             float: right;
             margin-top: 2px;
@@ -98,18 +121,18 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 3px;
+            margin-top: 5px;
         }
 
         .data-table td {
-            padding: 1.5px 0;
+            padding: 2px 0;
             vertical-align: middle;
         }
 
         .label {
             font-weight: bold;
             color: #333333;
-            width: 105px;
+            width: 110px;
             text-transform: uppercase;
             font-size: 8.5px;
         }
@@ -124,99 +147,99 @@
         }
 
         .concepto-box {
-            margin-top: 3px;
+            margin-top: 6px;
             border-top: 1px dashed #cccccc;
-            padding-top: 3px;
+            padding-top: 6px;
         }
 
         .concepto-text {
-            font-size: 8.5px;
+            font-size: 9px;
             color: #111111;
             text-align: justify;
-            line-height: 1.2;
+            line-height: 1.25;
         }
 
         .disclaimer-box {
-            margin-top: 3px;
-            font-size: 7px;
+            margin-top: 50px;
+            font-size: 8px;
             color: #555555;
             text-align: justify;
-            line-height: 1.05;
+            line-height: 1.15;
         }
 
+        /* Ajustamos las firmas para que acompañen la nueva altura elegante del bloque */
         .footer-row {
-            width: 100%;
-            margin-top: 3px;
+            width: 95%;
+            border-collapse: collapse;
+            position: absolute;
+            bottom: 30px;
+            /* Excelente espacio de respeto con el borde negro */
+            left: 18px;
         }
 
         .fecha-text {
             text-align: right;
             font-size: 8.5px;
             font-weight: bold;
+            vertical-align: bottom;
         }
 
         .firma-section {
             width: 100%;
             text-align: center;
-            margin-top: 8px;
         }
 
         .linea-firma {
-            width: 160px;
+            width: 180px;
             border-top: 1px solid #000000;
             margin: 0 auto;
         }
 
         .nombre-firma {
             font-size: 7.5px;
-            margin-top: 1px;
+            margin-top: 3px;
             text-transform: uppercase;
+            font-weight: bold;
         }
 
-        /* Línea divisoria compacta para evitar saltos */
+        /* MODIFICADO: Aumentamos el margen del divisor para centrar la tijera en el espacio restante */
         .divisor-tijera {
-            height: 4%;
-            text-align: center;
-            position: relative;
+            height: 25px;
             line-height: 25px;
-        }
-
-        .linea-punteada {
-            border-top: 1px dashed #555555;
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            z-index: 1;
+            text-align: center;
+            margin: 15px 0;
         }
 
         .tijera-icon {
-            background-color: #ffffff;
-            padding: 0 10px;
-            position: relative;
-            z-index: 2;
-            font-size: 11px;
-            color: #333333;
+            font-size: 10px;
+            color: #555555;
         }
     </style>
-
 </head>
 
 <body>
 
-    <!-- ==================== 1. TALÓN SUPERIOR (INSTITUCIONAL) ==================== -->
+    <!-- ==================== 1. TALÓN SUPERIOR ==================== -->
     <div class="talon-bloque">
         <table class="header-table">
             <tr>
-                <td class="logo-cell">
-                    <img src="https://wikimedia.org" class="logo-img" alt="Escudo Bolivia">
+                <!-- Columna Izquierda: Contiene los dos logos alineados en fila -->
+                <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
+
+                    <img src="{{ public_path('img/logo.png') }}" class="logo-agemed-img" alt="Logo AGEMED"
+                        style="display: inline-block; vertical-align: middle;">
                 </td>
-                <td class="title-cell">
+
+                <!-- Columna Central: Títulos Institucionales Centrados -->
+                <td class="title-cell" style="width: 60%; text-align: center; vertical-align: middle;">
                     <div class="institution-title">AGENCIA ESTATAL DE MEDICAMENTOS Y TECNOLOGÍAS EN SALUD</div>
                     <div class="document-title">ORDEN DE PAGO POR VENTA DE SERVICIOS</div>
-                    <div class="institution-title" style="font-size: 8px; margin-top: 1px; color: #555555;">MINISTERIO
+                    <div class="institution-title" style="font-size: 7.5px; margin-top: 1px; color: #555555;">MINISTERIO
                         DE SALUD Y DEPORTES</div>
                 </td>
-                <td class="form-code-cell">
+
+                <!-- Columna Derecha: Código de Formulario y Número de Orden -->
+                <td class="form-code-cell" style="width: 15%; text-align: right; vertical-align: top;">
                     <div class="form-code">FORM.AGEMED-02</div>
                     <div class="numero-orden-box">
                         <div class="numero-orden-text">{{ $orden->numero_orden }}</div>
@@ -224,6 +247,8 @@
                 </td>
             </tr>
         </table>
+
+
 
         <table class="data-table">
             <tr>
@@ -236,7 +261,7 @@
             </tr>
             <tr>
                 <td class="label">Cuenta Bancaria:</td>
-                <td class="value" style="font-size: 9px; color: #444444;">Realizar el depósito en el Banco Unión Cta.
+                <td class="value" style="font-size: 8.5px; color: #444444;">Realizar el depósito en el Banco Unión Cta.
                     10000023848754 Agencia Estatal de Medicamentos y Tecnologías en Salud - AGEMED.</td>
             </tr>
             <tr>
@@ -254,9 +279,13 @@
         <div class="concepto-box">
             <span class="label" style="display: block; margin-bottom: 2px;">Concepto de pago:</span>
             <div class="concepto-text">
+                <span style="color: #dc2626; font-weight: bold; font-size: 9.5px; margin-right: 6px;">
+                    [{{ $orden->codigo_misa ?? 'SIN CÓDIGO' }}]
+                </span>
                 <strong>{{ $orden->arancel?->codigo_arancel }}</strong>.- {{ $orden->arancel?->nombre_arancel }}
-                @if($orden->descripcion) <br><span style="color: #555555; font-style: italic;">Glosa:
-                {{ $orden->descripcion }}</span> @endif
+                @if($orden->descripcion)
+                    <br><span style="color: #555555; font-style: italic;">Glosa: {{ $orden->descripcion }}</span>
+                @endif
             </div>
         </div>
 
@@ -275,35 +304,42 @@
                         <div class="nombre-firma">{{ $orden->empresa?->razon_social }}</div>
                     </div>
                 </td>
-                <td style="width: 50%; vertical-align: bottom;">
-                    <div class="fecha-text">La Paz,
-                        {{ \Carbon\Carbon::parse($orden->fecha)->format('d \d\e F \d\e Y') }}
+                <td style="width: 50%;">
+                    <div class="fecha-text">La Paz, {{ date('d') }} de
+                        {{ ['January' => 'enero', 'February' => 'febrero', 'March' => 'marzo', 'April' => 'abril', 'May' => 'mayo', 'June' => 'junio', 'July' => 'julio', 'August' => 'agosto', 'September' => 'septiembre', 'October' => 'octubre', 'November' => 'noviembre', 'December' => 'diciembre'][date('F')] }}
+                        de {{ date('Y') }}
                     </div>
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- ==================== LÍNEA DE CORTE (TIJERA) ==================== -->
+    <!-- ==================== LÍNEA DIVISORIA ==================== -->
     <div class="divisor-tijera">
-        <div class="linea-punteada"></div>
-        <span class="tijera-icon">✂-----------------------------------------------------------------------------</span>
+        <span
+            class="tijera-icon">✂-----------------------------------------------------------------------------------------</span>
     </div>
-
-    <!-- ==================== 2. TALÓN INFERIOR (CLIENTE) ==================== -->
+    <!-- ==================== 2. TALÓN INFERIOR ==================== -->
     <div class="talon-bloque">
         <table class="header-table">
             <tr>
-                <td class="logo-cell">
-                    <img src="https://wikimedia.org" class="logo-img" alt="Escudo Bolivia">
+                <!-- Columna Izquierda: Contiene los dos logos alineados en fila -->
+                <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
+
+                    <img src="{{ public_path('img/logo.png') }}" class="logo-agemed-img" alt="Logo AGEMED"
+                        style="display: inline-block; vertical-align: middle;">
                 </td>
-                <td class="title-cell">
+
+                <!-- Columna Central: Títulos Institucionales Centrados -->
+                <td class="title-cell" style="width: 60%; text-align: center; vertical-align: middle;">
                     <div class="institution-title">AGENCIA ESTATAL DE MEDICAMENTOS Y TECNOLOGÍAS EN SALUD</div>
                     <div class="document-title">ORDEN DE PAGO POR VENTA DE SERVICIOS</div>
-                    <div class="institution-title" style="font-size: 8px; margin-top: 1px; color: #555555;">MINISTERIO
+                    <div class="institution-title" style="font-size: 7.5px; margin-top: 1px; color: #555555;">MINISTERIO
                         DE SALUD Y DEPORTES</div>
                 </td>
-                <td class="form-code-cell">
+
+                <!-- Columna Derecha: Código de Formulario y Número de Orden -->
+                <td class="form-code-cell" style="width: 15%; text-align: right; vertical-align: top;">
                     <div class="form-code">FORM.AGEMED-02</div>
                     <div class="numero-orden-box">
                         <div class="numero-orden-text">{{ $orden->numero_orden }}</div>
@@ -311,6 +347,7 @@
                 </td>
             </tr>
         </table>
+
 
         <table class="data-table">
             <tr>
@@ -323,7 +360,7 @@
             </tr>
             <tr>
                 <td class="label">Cuenta Bancaria:</td>
-                <td class="value" style="font-size: 9px; color: #444444;">Realizar el depósito en el Banco Unión Cta.
+                <td class="value" style="font-size: 8.5px; color: #444444;">Realizar el depósito en el Banco Unión Cta.
                     10000023848754 Agencia Estatal de Medicamentos y Tecnologías en Salud - AGEMED.</td>
             </tr>
             <tr>
@@ -341,10 +378,41 @@
         <div class="concepto-box">
             <span class="label" style="display: block; margin-bottom: 2px;">Concepto de pago:</span>
             <div class="concepto-text">
+                <span style="color: #dc2626; font-weight: bold; font-size: 9.5px; margin-right: 6px;">
+                    [{{ $orden->codigo_misa ?? 'SIN CÓDIGO' }}]
+                </span>
                 <strong>{{ $orden->arancel?->codigo_arancel }}</strong>.- {{ $orden->arancel?->nombre_arancel }}
-                @if($orden->descripcion) <br><span style="color: #555555; font-style: italic;">Glosa:
-                {{ $orden->descripcion }}</span> @endif
+                @if($orden->descripcion)
+                    <br><span style="color: #555555; font-style: italic;">Glosa: {{ $orden->descripcion }}</span>
+                @endif
             </div>
         </div>
 
         <div class="disclaimer-box">
+            Aquellas personas, sean naturales o jurídicas, que efectúen depósitos en la cuenta señalada anteriormente,
+            SIN RECABAR ORDEN DE PAGO correspondiente, serán responsables de los inconvenientes que conlleven a la
+            recuperación de los mismos. Por lo que la Agencia Estatal de Medicamentos y Tecnologías en Salud - AGEMED,
+            deslinda cualquier responsabilidad ante estos hechos.
+        </div>
+
+        <table class="footer-row">
+            <tr>
+                <td style="width: 50%;">
+                    <div class="firma-section">
+                        <div class="linea-firma"></div>
+                        <div class="nombre-firma">{{ $orden->empresa?->razon_social }}</div>
+                    </div>
+                </td>
+                <td style="width: 50%;">
+                    <div class="fecha-text">La Paz, {{ date('d') }} de
+                        {{ ['January' => 'enero', 'February' => 'febrero', 'March' => 'marzo', 'April' => 'abril', 'May' => 'mayo', 'June' => 'junio', 'July' => 'julio', 'August' => 'agosto', 'September' => 'septiembre', 'October' => 'octubre', 'November' => 'noviembre', 'December' => 'diciembre'][date('F')] }}
+                        de {{ date('Y') }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+
+</html>
